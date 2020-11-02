@@ -1,0 +1,45 @@
+.matrix-table{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+.matrix-cell {
+    border: 1px solid black;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    cursor: pointer;
+}
+.matrix-cell-wrapper {
+    width: 30px;
+    height: 30px;
+}
+
+.cell-type-start {
+    background-color: dodgerblue;
+}
+.cell-type-r {
+
+}
+.cell-type-w {
+    background-color: black;
+}
+.cell-type-d {
+    background-color: darkgrey;
+}
+.cell-type-s {
+    background-color: brown;
+}
+.cell-type-e {
+    background-color: yellowgreen;
+}
+
+.selected {
+    background-color: cornflowerblue;
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}

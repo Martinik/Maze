@@ -1,0 +1,132 @@
+<?php
+$floor = (int)$viewBag['floor'];
+/** @var \PathFinder\Models\MyNode $startNode */
+$startNode = $viewBag['startNode'];
+$nearestExitData = $viewBag['nearestExitData'];
+$exitSequence = !empty($nearestExitData) && isset($nearestExitData['sequence'])
+    ? $nearestExitData['sequence'] : [];
+$exitSequenceMapped =
+    !empty($nearestExitData) && isset($nearestExitData['sequenceMapped'])
+        ? $nearestExitData['sequenceMapped'] : [];
+?>
+<form method="get">
+    <div class="row">
+        <div class="offset-md-5 col-md-2 text-center">
+            <div class="form-group">
+                <label for="start">Click on a cell to pick a new starting point!</label>
+                <div class="input-group">
+                    <input id="start" type="text" name="start" class="form-control"
+                           value="<?= empty($startNode) ? '' : $startNode->getX().'x'.$startNode->getY().'x'.$startNode->getZ(); ?>">
+                    <div class="input-group-append">
+                        <input type="submit" class="form-control btn btn-info" value="FIND">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<hr>
+
+<div class="row">
+    <div class="col-md-4 text-center">
+        <?php if (!empty($exitSequence)) { ?>
+            <div>
+                <h4>Steps</h4>
+                <hr width="50%">
+            </div>
+            <?php foreach ($exitSequence as $node) { ?>
+                <div>
+                    <span><?= "{$node->getX()}, {$node->getY()}, {$node->getZ()}" ?></span>
+                </div>
+            <?php } ?>
+            <div>
+                <hr width="50%">
+                <h5>Time: <?= $nearestExitData['score'] ?? '?' ?>s</h5>
+            </div>
+        <?php } ?>
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="text-center">
+            <table class=" matrix-table">
+                <tbody>
+                <?php foreach ($viewBag['matrix'] as $rowIndex => $row) { ?>
+                    <tr>
+                        <?php foreach ($row as $colIndex => $cellType) {
+
+                            if (!empty($startNode))
+                            {
+                                $currentCellIsStartPos =
+                                    $startNode->getZ() == $floor
+                                    && $startNode->getY() == $rowIndex
+                                    && $startNode->getX() == $colIndex;
+                            } else {
+                                $currentCellIsStartPos = false;
+                            }
+
+                            $cellTypeClass = $currentCellIsStartPos ? 'start' : strtolower($cellType);
+                            ?>
+                            <td class="matrix-cell cell-type-<?= $cellTypeClass ?>"
+                                data-val="<?=$colIndex.'x'.$rowIndex.'x'.$floor?>">
+                                <div title="<?= $colIndex.'x'.$rowIndex.'x'.$floor ?>" class="matrix-cell-wrapper matrix-cell-wrapper-<?= $cellTypeClass ?> text-center">
+                                    <?php
+                                    if (!empty($startNode)
+                                    && $startNode->getY() == $rowIndex
+                                    && $startNode->getX() == $colIndex
+                                    && $startNode->getZ() != $floor) {
+                                        $floorDiff = $startNode->getZ() - $floor
+                                        ?>
+                                        <strong class="text-info">
+                                            <span class="fa fa-arrow-<?= $floorDiff > 0 ? 'up' : 'down' ?>"></span>
+                                           <?= abs($floorDiff) ?>
+                                        </strong>
+                                    <?php } else if (
+                                            !empty($exitSequenceMapped)
+                                        && isset($exitSequenceMapped[$floor])
+                                        && isset($exitSequenceMapped[$floor][$rowIndex])
+                                        && isset($exitSequenceMapped[$floor][$rowIndex][$colIndex])
+                                    )
+                                    {
+                                        ?>
+                                        <strong class="text-info">
+                                            <span class="fa fa-circle"></span>
+                                        </strong>
+                                    <?php }  ?>
+                                </div>
+                            </td>
+                        <?php } ?>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <strong>
+                    <?php
+                    $pagingParams =  !empty($startNode) ? '?start='.$startNode->getX().'x'.$startNode->getY().'x'.$startNode->getZ(): ''
+                    ?>
+                    <a href="/checkFloor/<?= $floor + 1 ?><?= $pagingParams ?>">Go Up</a>
+                </strong>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>FLOOR <?= $floor ?></h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <strong>
+                    <?php if ($floor > 0) { ?>
+                        <a href="/checkFloor/<?= $floor - 1 ?><?= $pagingParams ?>">Go Down</a>
+                    <?php } else { ?>
+                        -ground floor-
+                    <?php } ?>
+                </strong>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>

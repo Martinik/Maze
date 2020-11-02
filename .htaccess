@@ -1,0 +1,60 @@
+# Enable rewriting.
+RewriteEngine on
+
+# Optional: do not allow perusal of directories.
+Options -Indexes
+
+# Optional: explicitly enable per-directory rewrites in the .htaccess context.
+Options +FollowSymLinks
+
+# Required when not in the webroot. Always use a trailing slash.
+RewriteBase /
+
+# To be able to access existing directories and files (standalone scripts).
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Redirect everything else to index.php.
+# Add QSA to ensure that querystring variables are registered as such.
+RewriteRule . index.php [L,QSA]
+
+RewriteEngine on
+Options +FollowSymlinks -MultiViews
+
+# to redirect my.site.com to my.site.com/index.html
+RewriteRule ^$ /index.php [R,L]
+
+# to redirect /dir1/dir2 to index.php?url=dir1/dir2
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond  %{QUERY_STRING} !^url=
+
+# Redirect everything else to index.php.
+# Add QSA to ensure that querystring variables are registered as such.
+RewriteRule . index.php [L,QSA]
+
+RewriteRule ^([^/]+)/([^/]+)/?$ /index.php?url=$1/$2 [R,L,QSA]
+
+
+
+
+
+#
+#RewriteEngine On
+#RewriteBase /pathfinder
+#
+#RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
+#RewriteRule ^ %1 [L,NE,R=302]
+#RewriteRule ^(.*)$ public/index.php?$1 [L,QSA]
+#
+## to redirect my.site.com to my.site.com/index.html
+#RewriteRule ^$ /index.php [R,L]
+#
+## to redirect /dir1/dir2 to index.php?url=dir1/dir2
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond  %{QUERY_STRING} !^url=
+#
+## Redirect everything else to index.php.
+## Add QSA to ensure that querystring variables are registered as such.
+#RewriteRule . index.php [L,QSA]
+#
+#RewriteRule ^([^/]+)/([^/]+)/?$ /index.php?url=$1/$2 [R,L,QSA]
